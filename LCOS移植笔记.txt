@@ -1,0 +1,105 @@
+Mach-itop4412.c (arch\arm\mach-exynos)
+
+CONFIG_TOUCHSCREEN_TSC2007
+CONFIG_TOUCHSCREEN_FT5X0X
+
+
+
+───────────────────────────────────────────────────── Search Results ─────────────────────────────────────────────────────┐
+  │ Symbol: TOUCHSCREEN_TSC2007 [=y]                                                                                         │
+  │ Type  : tristate                                                                                                         │
+  │ Prompt: TSC2007 based touchscreens                                                                                       │
+  │   Defined at drivers/input/touchscreen/Kconfig:692                                                                       │
+  │   Depends on: !S390 && INPUT [=y] && INPUT_TOUCHSCREEN [=y] && I2C [=y]                                                  │
+  │   Location:                                                                                                              │
+  │     -> Device Drivers                                                                                                    │
+  │       -> Input device support                                                                                            │
+  │         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                            │
+  │           -> Touchscreens (INPUT_TOUCHSCREEN [=y])                                                                       │
+  │                            
+
+
+
+ Symbol: TOUCHSCREEN_FT5X0X [=y]                                                                                          │
+  │ Type  : tristate                                                                                                         │
+  │ Prompt: FT5X0X based touchscreens                                                                                        │
+  │   Defined at drivers/input/touchscreen/Kconfig:757                                                                       │
+  │   Depends on: !S390 && INPUT [=y] && INPUT_TOUCHSCREEN [=y] && I2C [=y]                                                  │
+  │   Location:                                                                                                              │
+  │     -> Device Drivers                                                                                                    │
+  │       -> Input device support                                                                                            │
+  │         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                            │
+  │           -> Touchscreens (INPUT_TOUCHSCREEN [=y])                                                                       │
+  │                                                                                                     	
+
+编译过程中的错误：
+/home/lcos/drive/lcos.c: In function 'lcos_gpio_realse':
+/home/lcos/drive/lcos.c:425: warning: no return statement in function returning non-void
+/home/lcos/drive/lcos.c: In function 'lcos_mode_open':
+/home/lcos/drive/lcos.c:429: warning: unused variable 'result'
+/home/lcos/drive/lcos.c: In function 'lcos_mode_ioctl':
+/home/lcos/drive/lcos.c:439: error: dereferencing pointer to incomplete type
+/home/lcos/drive/lcos.c: At top level:
+/home/lcos/drive/lcos.c:473: error: variable 'lcos_fops' has initializer but incomplete type
+/home/lcos/drive/lcos.c:474: error: unknown field 'open' specified in initializer
+/home/lcos/drive/lcos.c:474: warning: excess elements in struct initializer
+/home/lcos/drive/lcos.c:474: warning: (near initialization for 'lcos_fops')
+/home/lcos/drive/lcos.c:475: error: unknown field 'release' specified in initializer
+/home/lcos/drive/lcos.c:475: warning: excess elements in struct initializer
+/home/lcos/drive/lcos.c:475: warning: (near initialization for 'lcos_fops')
+/home/lcos/drive/lcos.c:476: error: unknown field 'unlocked_ioctl' specified in initializer
+/home/lcos/drive/lcos.c:476: warning: excess elements in struct initializer
+/home/lcos/drive/lcos.c:476: warning: (near initialization for 'lcos_fops')
+/home/lcos/drive/lcos.c:477: error: unknown field 'owner' specified in initializer
+/home/lcos/drive/lcos.c:477: warning: excess elements in struct initializer
+/home/lcos/drive/lcos.c:477: warning: (near initialization for 'lcos_fops')
+/home/lcos/drive/lcos.c: In function 'lcos_probe':
+/home/lcos/drive/lcos.c:508: error: incompatible type for argument 1 of 'memcpy'
+/home/iTop4412/kernel/iTop4412_Kernel_3.0/arch/arm/include/asm/string.h:16: note: expected 'void *' but argument is of type 'struct lcos_i2c_platform_data'
+/home/lcos/drive/lcos.c: At top level:
+/home/lcos/drive/lcos.c:559: warning: data definition has no type or storage class
+/home/lcos/drive/lcos.c:559: warning: type defaults to 'int' in declaration of 'module_i2c_driver'
+/home/lcos/drive/lcos.c:559: warning: parameter names (without types) in function declaration
+make[2]: *** [/home/lcos/drive/lcos.o] Error 1
+make[1]: *** [_module_/home/lcos/drive] Error 2
+make[1]: Leaving directory `/home/iTop4412/kernel/iTop4412_Kernel_3.0'
+
+
+
+shell@itop4412:/sys/bus/i2c # ll
+drwxr-xr-x root     root              2012-01-01 08:37 devices
+drwxr-xr-x root     root              2012-01-01 08:37 drivers
+-rw-r--r-- root     root         4096 2012-01-01 08:37 drivers_autoprobe
+--w------- root     root         4096 2012-01-01 08:37 drivers_probe
+--w------- root     root         4096 2012-01-01 08:37 uevent
+shell@itop4412:/sys/bus/i2c # cd devices/
+shell@itop4412:/sys/bus/i2c/devices # ll
+lrwxrwxrwx root     root              2012-01-01 08:37 0-003a -> ../../../devices/platform/i2c-gpio.0/i2c-0/0-003a
+lrwxrwxrwx root     root              2012-01-01 08:37 1-0006 -> ../../../devices/platform/s3c2440-i2c.1/i2c-1/1-0006
+lrwxrwxrwx root     root              2012-01-01 08:37 1-0066 -> ../../../devices/platform/s3c2440-i2c.1/i2c-1/1-0066
+lrwxrwxrwx root     root              2012-01-01 08:37 4-001a -> ../../../devices/platform/s3c2440-i2c.4/i2c-4/4-001a
+lrwxrwxrwx root     root              2012-01-01 08:37 5-0068 -> ../../../devices/platform/s3c2440-i2c.5/i2c-5/5-0068
+lrwxrwxrwx root     root              2012-01-01 08:37 7-0048 -> ../../../devices/platform/s3c2440-i2c.7/i2c-7/7-0048
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-0 -> ../../../devices/platform/i2c-gpio.0/i2c-0
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-1 -> ../../../devices/platform/s3c2440-i2c.1/i2c-1
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-3 -> ../../../devices/platform/s3c2440-i2c.3/i2c-3
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-4 -> ../../../devices/platform/s3c2440-i2c.4/i2c-4
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-5 -> ../../../devices/platform/s3c2440-i2c.5/i2c-5
+lrwxrwxrwx root     root              2012-01-01 08:37 i2c-7 -> ../../../devices/platform/s3c2440-i2c.7/i2c-7
+
+shell@itop4412:/sys/bus/i2c # cd drivers
+shell@itop4412:/sys/bus/i2c/drivers # ll
+drwxr-xr-x root     root              2012-01-01 08:38 dummy
+drwxr-xr-x root     root              2012-01-01 08:38 ir-kbd-i2c
+drwxr-xr-x root     root              2012-01-01 08:38 mpu6050B1
+drwxr-xr-x root     root              2012-01-01 08:38 ov5640
+drwxr-xr-x root     root              2012-01-01 08:38 s5m87xx
+drwxr-xr-x root     root              2012-01-01 08:38 s5p_ddc
+drwxr-xr-x root     root              2012-01-01 08:38 wm8960-codec
+
+
+shell@itop4412:/data/lcos # insmod lcos.ko
+[ 5011.224034] --->lcos_probe is ok
+[ 5011.225936] --->lcos memcpy   pdata->gpio_platdata!
+[ 5011.233368] --->lcos device driver probe successfully
+[ 5011.238750] lcos_init: Probe name LCOS
