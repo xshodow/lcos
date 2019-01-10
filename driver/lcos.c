@@ -115,158 +115,169 @@ struct lcos_data {
 };
 static struct lcos_data *g_lcos_data;
 
-
+static int hx7097_write_data(struct i2c_client *client,uint8_t aregaddr, uint8_t avalue)
+{
+	int error;
+	uint8_t data[2] = { aregaddr, avalue };
+	struct i2c_msg msg = 
+	{
+		client->addr, I2C_M_IGNORE_NAK, 2, (uint8_t *)data
+	};
+	
+	error = i2c_transfer(client->adapter, &msg, 1);
+	return error < 0 ? error : 0;
+}
 static int  lcos_reg_init(struct i2c_client *client)
 {
 	int result;
-
-	result = i2c_smbus_write_byte_data(client, LCOS_INTER_SET, 0x05);
+  printk("----->>>hx7097_write_data<<<-----\n");
+	result = hx7097_write_data(client, LCOS_INTER_SET, 0x05);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_DISPLAY_DIR, 0x03);
+	result = hx7097_write_data(client, LCOS_DISPLAY_DIR, 0x03);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_VCOM_SET_L, 0x01);
+	result = hx7097_write_data(client, LCOS_VCOM_SET_L, 0x01);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_VCOM_SET_H, 0x0A);
+	result = hx7097_write_data(client, LCOS_VCOM_SET_H, 0x0A);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_VCSTN_SET_L,0x01);
+	result = hx7097_write_data(client, LCOS_VCSTN_SET_L,0x01);
 	if (result < 0)
 		goto out;			
-  result = i2c_smbus_write_byte_data(client, LCOS_VCSTN_SET_H,0x0A);
+  result = hx7097_write_data(client, LCOS_VCSTN_SET_H,0x0A);
 	if (result < 0)
 		goto out;
 		
-	result = i2c_smbus_write_byte_data(client, LCOS_VRING_SET_L,0xFA);
+	result = hx7097_write_data(client, LCOS_VRING_SET_L,0xFA);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_VRING_SET_H,0x05);
+	result = hx7097_write_data(client, LCOS_VRING_SET_H,0x05);
 	if (result < 0)
 		goto out;
 
 	
-	result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP1,0xFF);
+	result = hx7097_write_data(client, LCOS_GMA_RGMAP1,0xFF);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP2,0xB0);
+	result = hx7097_write_data(client, LCOS_GMA_RGMAP2,0xB0);
 	if (result < 0)
 		goto out;
-	result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP3,0x70);
+	result = hx7097_write_data(client, LCOS_GMA_RGMAP3,0x70);
 	if (result < 0)
 		goto out;
 		
-	result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP4,0x40);
+	result = hx7097_write_data(client, LCOS_GMA_RGMAP4,0x40);
 	if (result < 0)
 		goto out;	
-		result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP5,0x0C);
+		result = hx7097_write_data(client, LCOS_GMA_RGMAP5,0x0C);
 	if (result < 0)
 		goto out;
-  	result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAP6,0x0A);
+  	result = hx7097_write_data(client, LCOS_GMA_RGMAP6,0x0A);
 	if (result < 0)
 		goto out;
 			
-		result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN1,0x00);
+		result = hx7097_write_data(client, LCOS_GMA_RGMAN1,0x00);
 	if (result < 0)
 		goto out;
-		result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN2,0x4E);
+		result = hx7097_write_data(client, LCOS_GMA_RGMAN2,0x4E);
 	if (result < 0)
 		goto out;
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN3,0x8F);
+			result = hx7097_write_data(client, LCOS_GMA_RGMAN3,0x8F);
 	if (result < 0)
 		goto out;
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN4,0XBF);
+			result = hx7097_write_data(client, LCOS_GMA_RGMAN4,0XBF);
 	if (result < 0)
 		goto out;
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN5,0XF3);
+			result = hx7097_write_data(client, LCOS_GMA_RGMAN5,0XF3);
 	if (result < 0)
 		goto out;
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_RGMAN6,0xFF);
+			result = hx7097_write_data(client, LCOS_GMA_RGMAN6,0xFF);
 	if (result < 0)
 		goto out;
 		
 		
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP1,0xFF);
+			result = hx7097_write_data(client, LCOS_GMA_GGMAP1,0xFF);
 	if (result < 0)
 		goto out;	
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP2,0xB0);
+			result = hx7097_write_data(client, LCOS_GMA_GGMAP2,0xB0);
 	if (result < 0)
 		goto out;
-			result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP3,0x70);
-	if (result < 0)
-		goto out;
-		
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP4,0x40);
-	if (result < 0)
-		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP5,0x0C);
-	if (result < 0)
-		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAP6,0x0A);
+			result = hx7097_write_data(client, LCOS_GMA_GGMAP3,0x70);
 	if (result < 0)
 		goto out;
 		
+		  result = hx7097_write_data(client, LCOS_GMA_GGMAP4,0x40);
+	if (result < 0)
+		goto out;
+		  result = hx7097_write_data(client, LCOS_GMA_GGMAP5,0x0C);
+	if (result < 0)
+		goto out;
+			  result = hx7097_write_data(client, LCOS_GMA_GGMAP6,0x0A);
+	if (result < 0)
+		goto out;
 		
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAN1,0x00);
+		
+		  result = hx7097_write_data(client, LCOS_GMA_GGMAN1,0x00);
 	if (result < 0)
 		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAN2,0x4E);
+			  result = hx7097_write_data(client, LCOS_GMA_GGMAN2,0x4E);
 	if (result < 0)
 		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAN4,0x8F);
+		  result = hx7097_write_data(client, LCOS_GMA_GGMAN4,0x8F);
 	if (result < 0)
 		goto out;
 	
 	
-		result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAN5,0xBF);
+		result = hx7097_write_data(client, LCOS_GMA_GGMAN5,0xBF);
 	if (result < 0)
 		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_GGMAN6,0XF3);
+		  result = hx7097_write_data(client, LCOS_GMA_GGMAN6,0XF3);
 	if (result < 0)
 		goto out;
 	
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP6,0xFF);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAP6,0xFF);
 	if (result < 0)
 		goto out;
 			
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP1,0xFF);
+		  result = hx7097_write_data(client, LCOS_GMA_BGMAP1,0xFF);
 	if (result < 0)
 		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP2,0xB0);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAP2,0xB0);
 	if (result < 0)
 		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP3,0x70);
-	if (result < 0)
-		goto out;
-		
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP4,0x40);
-	if (result < 0)
-		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP5,0x0C);
-	if (result < 0)
-		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAP6,0x0A);
+		  result = hx7097_write_data(client, LCOS_GMA_BGMAP3,0x70);
 	if (result < 0)
 		goto out;
 		
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN1,0x00);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAP4,0x40);
 	if (result < 0)
 		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN2,0x4E);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAP5,0x0C);
 	if (result < 0)
 		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN3,0x8F);
+		  result = hx7097_write_data(client, LCOS_GMA_BGMAP6,0x0A);
 	if (result < 0)
 		goto out;
 		
-	  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN4,0xBF);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAN1,0x00);
 	if (result < 0)
 		goto out;
-			  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN5,0XF3);
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAN2,0x4E);
 	if (result < 0)
 		goto out;
-		  result = i2c_smbus_write_byte_data(client, LCOS_GMA_BGMAN6,0xFF);
+		  result = hx7097_write_data(client, LCOS_GMA_BGMAN3,0x8F);
+	if (result < 0)
+		goto out;
+		
+	  result = hx7097_write_data(client, LCOS_GMA_BGMAN4,0xBF);
+	if (result < 0)
+		goto out;
+			  result = hx7097_write_data(client, LCOS_GMA_BGMAN5,0XF3);
+	if (result < 0)
+		goto out;
+		  result = hx7097_write_data(client, LCOS_GMA_BGMAN6,0xFF);
 	if (result < 0)
 		goto out;
 			
@@ -278,7 +289,7 @@ out:
 static int lcos_sc_open(struct i2c_client *client)
 {
 	int result;
-	 result = i2c_smbus_write_byte_data(client, LCOS_PANEL_POWER,0x0C);
+	 result = hx7097_write_data(client, LCOS_PANEL_POWER,0x0C);
 	if (result < 0)
 		goto out;
 	return result;
@@ -290,7 +301,7 @@ static int lcos_sc_open(struct i2c_client *client)
 static int lcos_sc_close(struct i2c_client *client)
 {
 	int result;
-	 result = i2c_smbus_write_byte_data(client, LCOS_PANEL_POWER,0x04);
+	 result = hx7097_write_data(client, LCOS_PANEL_POWER,0x04);
 	if (result < 0)
 		goto out;
 	return result;
@@ -306,18 +317,24 @@ static int lcos_power_on(void)
 	 mdelay(5); 
 	 gpio_set_value(g_lcos_data->gpio_platdata.gpio_reset, 1);
 	 mdelay(5); 
-   	result=lcos_reg_init(g_lcos_data->lcos_client);
+	 printk("----->>>lcos_reg_init--start---<<<----\n");
+        result=lcos_reg_init(g_lcos_data->lcos_client);
+   	printk("----->>>lcos_reg_init--end---<<<----\n");
 	if(result<0)
        {
 		goto err;
 	}
 	mdelay(5); 
-       gpio_set_value(g_lcos_data->gpio_platdata.gpio_vdda, 1);  
+  gpio_set_value(g_lcos_data->gpio_platdata.gpio_vdda, 1);  
 	mdelay(5); 
-
+  printk("----->>>lcos_sc_open--start---<<<----\n");
 	lcos_sc_open(g_lcos_data->lcos_client);
 	mdelay(5); 
+	printk("----->>>lcos_sc_open--end---<<<----\n");
+	
+  printk("----->>>lcos_sc_close--start---<<<----\n");
  	lcos_sc_close(g_lcos_data->lcos_client);
+ 	printk("----->>>lcos_sc_close--end---<<<----\n");
 	mdelay(5); 
 	gpio_set_value(g_lcos_data->gpio_platdata.gpio_light, 1);  
 	return 0;
@@ -326,9 +343,7 @@ static int lcos_power_on(void)
 
 }
 
-
-
-static int lcos_power_off(struct i2c_client *client)
+static int lcos_power_off(void)
 {
 	gpio_set_value(g_lcos_data->gpio_platdata.gpio_light, 0);  
 	lcos_sc_open(g_lcos_data->lcos_client);
@@ -429,9 +444,11 @@ static int lcos_gpio_realse(void)
 static int lcos_mode_open(struct inode *inode, struct file *file)
 {
 
-	//lcos_gpio_init();
-	
-	printk("--->lcos_mode_open is ok\n");
+  printk("--->lcos_mode_open is ok\n");
+  printk("----------lcos_gpio_init----------\n");
+	lcos_gpio_init();
+	printk("----------------------------------\n");
+
 	return 0;
 
 }
@@ -446,14 +463,16 @@ static long lcos_mode_ioctl(struct file *file, unsigned int cmd, unsigned long a
 	{
 		case LCOS_COMD_POWERON:
 		{
-			//lcos_power_on();
-			printk("--->lcos_power_on() is ok\n");
+			printk("----------lcos_power_on----------\n");
+			lcos_power_on();
+			printk("----------------------------------\n");
 			break;
 		}		
 		case LCOS_COMD_POWEROFF:
 		{
-			//lcos_power_off();
-			printk("--->lcos_power_off() is ok\n");
+			printk("----------lcos_power_off----------\n");
+			lcos_power_off();
+			printk("---------------------------------\n");
 			break;
 		}
 			
@@ -465,9 +484,10 @@ static long lcos_mode_ioctl(struct file *file, unsigned int cmd, unsigned long a
 }
 static int lcos_mode_release(struct inode *inode, struct file *file)
 {
-
-	//lcos_gpio_realse();
 	printk("--->lcos_mode_release is ok\n");
+  printk("----------lcos_gpio_realse----------\n");
+	lcos_gpio_realse();
+	printk("------------------------------------\n");
 	return 0;
 }
 
@@ -504,11 +524,11 @@ static int lcos_probe(struct i2c_client *client,const struct i2c_device_id *id)
 			goto err_out;
 		}
 		g_lcos_data = pdata;
-		pdata->lcos_client= client;
+		g_lcos_data->lcos_client= client;
 
-		memcpy(&(pdata->gpio_platdata),lcosdata,sizeof(struct lcos_i2c_platform_data));
+		memcpy(&(g_lcos_data->gpio_platdata),lcosdata,sizeof(struct lcos_i2c_platform_data));
 		printk("--->lcos memcpy   pdata->gpio_platdata!\n");
-
+    i2c_set_clientdata(client, pdata);
 		result = misc_register(&lcos_device);
 		if (result != 0) {
 			printk(KERN_ERR "register lcos miscdevice error");
@@ -516,7 +536,10 @@ static int lcos_probe(struct i2c_client *client,const struct i2c_device_id *id)
 		}
 		pdata->lcos_miscdev= &lcos_device;
 			
-		printk("--->lcos device driver probe successfully");
+		printk("--->lcos device driver probe successfully\n");
+		printk("+++++++++++++++++lcos_reg_init start++++++++++++++++++++\n");
+		lcos_reg_init(client);
+    printk("+++++++++++++++++lcos_reg_init end++++++++++++++++++++\n");
 		return 0;
 
 	err_regsiter_lcos_misc:
@@ -536,7 +559,7 @@ static int lcos_remove(struct i2c_client *client)
 		{
 			kfree(g_lcos_data);		
 		}
-
+	i2c_set_clientdata(client, NULL);
 	printk("--->lcos_remove is ok\n");
 	return 0;
 }

@@ -1,3 +1,8 @@
+cp config_for_android_scp .config
+sudo make ARCH=arm menuconfig 
+ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- make
+sudo make ARCH=arm zImage -j20
+
 Mach-itop4412.c (arch\arm\mach-exynos)
 
 CONFIG_TOUCHSCREEN_TSC2007
@@ -97,9 +102,129 @@ drwxr-xr-x root     root              2012-01-01 08:38 s5m87xx
 drwxr-xr-x root     root              2012-01-01 08:38 s5p_ddc
 drwxr-xr-x root     root              2012-01-01 08:38 wm8960-codec
 
-
+//1.IIC-7总线设备,杂项设备驱动调用流程正常
 shell@itop4412:/data/lcos # insmod lcos.ko
 [ 5011.224034] --->lcos_probe is ok
 [ 5011.225936] --->lcos memcpy   pdata->gpio_platdata!
 [ 5011.233368] --->lcos device driver probe successfully
 [ 5011.238750] lcos_init: Probe name LCOS
+
+
+
+//2.调用lcos_mode_ioctl时发生错误
+shell@itop4412:/data/lcos # ./lcostest on
+[ 6560.890754] --->lcos_mode_open is ok
+[ 6560.892886] ----------lcos_gpio_init----------
+[ 6560.897420] ----------------------------------
+[ 6560.901812] --->lcos_mode_ioctl() is ok
+[ 6560.905608] ----------lcos_power_on----------
+[ 6560.920676] lcos_hx7097 7-0048: Error when init lcos device:(-6)----------------------------------
+[ 6560.928210] --->lcos_mode_release is ok
+[ 6560.932064] ----------lcos_gpio_realse----------
+[ 6560.936666] ------------------------------------
+
+
+lcos_hx7097 7-0048: Error when init lcos device:(-6)----------------------------------
+
+static int hx7097_write_data(struct i2c_client *client,uint8_t aregaddr, uint8_t avalue)
+{
+	int error;
+	uint8_t data[2] = { aregaddr, avalue };
+	struct i2c_msg msg = 
+	{
+		client->addr, I2C_M_IGNORE_NAK, 2, (uint8_t *)data
+	};
+	
+	error = i2c_transfer(client->adapter, &msg, 1);
+	return error < 0 ? error : 0;
+}
+
+//3.屏幕显示呈现彩色横条问题，无法显示正常图像---
+
+//4.屏幕显示不清楚
+猜测导致问题的原因：
+1.framebuffer的相关配置有关(分辨率-刷新率-CLK-HSYNC设置)
+2.RGB565接入RGB888时，出现的色彩偏差
+
+
+(Resolution=800x480, VDDD=1.8V, VDDA=10V)
+Parameter Symbol Spec.
+Min. Typ. Max. Unit
+Frame rate FR 120 120 - Hz
+Line time TL - 9.5 - s
+Horizontal video active HACT 800 800 800 Pixel
+Horizontal total HTOTAL 860 880 1000 Pixel
+Vertical video active VACT 480 480 480 Line
+Vertical line total VTOTAL 510 528 600 Line
+Pixel clock period TCYC - 18 - ns
+Data to clock setup time TSETUP 0.15 - - TCYC
+Data to clock hold time THOLD 0.15 - - TCYC
+Pixel clock frequency CKFREQ 52.63 55.76 65 Mbps
+
+------------------------------------------------
+Pixel clock period -----18ns
+Data to clock setup time TSETUP -----3.6ns
+Data to clock hold time THOLD -----3.6ns
+Pixel clock frequency CKFREQ -------60Mbps
+
+
+
+
+HSPW 水平同步信号脉宽
+HBPD 水平同步信号前肩
+HFPD 水平同步信号后肩
+VSPW 垂直同步信号脉宽
+VBPD 垂直同步信号前肩
+VFPD 垂直同步信号后肩
+
+
+LCD控制器先发送 HSYNC 高电平脉冲，其宽度是 HSPW，
+这个脉冲告诉下面的信息是一行信息，
+这行信息由3部分组成，HBPD+有效行信息+HFPD，
+前后肩属于时序信息，有效信息是横向分辨率，
+多行就构成了一帧图像， 
+一帧图像的通信过程是这样的：整个帧图像信号分为4部分：VSPW+VBPD+帧有效信号+VFPD。VSPW是帧同步信号宽度，用来告诉驱动器一帧图像要开始了；VBPD和VFPD分别是垂直同步信号前后肩。这里讲的是CRT的时序，LCD和CRT兼容，所以不影响，
+
+
+
+static struct s3cfb_lcd wsvga_x710 = {
+	.width = 1024,			// 水平像素
+	.height = 600,			// 垂直像素
+	.p_width = 154,			// 物理水平尺寸
+	.p_height = 90,			// 物理垂直尺寸,16:9
+	.bpp = 24,				// 像素位宽,RGB888
+	.freq = 61,				// 帧率
+ 
+	.timing = {
+		.h_fp = 84,		// 水平前肩,水平无效时间
+		.h_bp = 84,		// 水平折返时间
+		.h_sw = 88,		// 水平稳定时间
+		.v_fp = 10,			// 垂直无效时间
+		.v_fpe = 1,			// 均匀场垂直前肩
+		.v_bp = 10,		// 垂直折返时间
+		.v_bpe = 1,		// 均匀场垂直后肩
+		.v_sw = 20,		// 垂直稳定时间
+	},
+	.polarity = {
+		.rise_vclk = 1,		// 上升沿数据有效
+		.inv_hsync = 0,		// 水平极性反转
+		.inv_vsync = 0,		// 垂直极性反转
+		.inv_vden = 0,		// 数据使能
+	},
+};
+
+
+两个都看了，lcd 硬件中 DE 是高电平触发，clk 是上升沿触发，hsync 是低脉冲触发 ，vsynsc 是低脉冲触发
+
+综合：
+
+要驱动lcd设备： 
+exynos 要设置成lcd触发有效的相应模式
+ 
+de—-高电平触发–不反转 
+
+clk—上升沿触发 —-相应位设置成1 
+
+hsync—是低脉冲触发—-反转 
+
+vsyns —是低脉冲触发—反转
